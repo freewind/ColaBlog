@@ -1,26 +1,33 @@
 package freewind.colablog
 
-import scalafx.Includes._
 import scalafx.application.JFXApp
 import scalafx.scene.Scene
-import scalafx.scene.paint.Color
-import scalafx.scene.shape.Rectangle
+import scalafx.scene.layout.{Priority, HBox}
+import scalafx.scene.control.TextArea
 
 object App extends JFXApp {
 
   stage = new JFXApp.PrimaryStage {
-    title = "Hello World"
-    width = 600
-    height = 450
+    title = "Cola Blog"
+    width = 1200
+    height = 600
     scene = new Scene {
-      fill = Color.LIGHTGREEN
-      content = Set(new Rectangle {
-        x = 25
-        y = 40
-        width = 100
-        height = 100
-        fill <== when(hover) choose Color.GREEN otherwise Color.RED
-      })
+      theScene =>
+      content = new HBox {
+        prefWidth <== theScene.width
+        prefHeight <== theScene.height
+        hgrow = Priority.ALWAYS
+        content = List(
+          new TextArea {
+            hgrow = Priority.ALWAYS
+            text = "markdown here"
+          },
+          new TextArea {
+            hgrow = Priority.ALWAYS
+            text = "rendered html here"
+          }
+        )
+      }
     }
   }
 
