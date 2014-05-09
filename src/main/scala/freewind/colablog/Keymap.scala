@@ -21,7 +21,9 @@ case class KeyshortHandler(action: PartialFunction[Keyshort, Unit]) extends Even
     }).map(_._2)
 
     foundKeyshort.foreach {
-      keyshort => action.apply(keyshort)
+      keyshort => if (action.isDefinedAt(keyshort)) {
+        action.apply(keyshort)
+      }
     }
   }
 
