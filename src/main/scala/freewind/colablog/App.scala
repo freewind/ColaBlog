@@ -15,7 +15,7 @@ object App extends JFXApp {
 
   val WidthUnit = 1
 
-  val editor: TextArea = new TextArea {
+  val editor: TextArea = new TextArea(new TextAreaSupportsPastingImage) {
     id = "editor"
     prefWidth = WidthUnit
     wrapText = true
