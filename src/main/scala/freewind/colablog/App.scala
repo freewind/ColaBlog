@@ -20,28 +20,14 @@ object App extends JFXApp {
     prefWidth = WidthUnit
     wrapText = true
     hgrow = Priority.ALWAYS
-    this.onKeyPressed = new EventHandler[KeyEvent] {
-      private var lastIncreaseTime: Long = 0
 
-      override def handle(event: KeyEvent): Unit = {
-        if (event.isMetaDown) {
-          if (event.getCode == KeyCode.EQUALS) {
-            val now = System.currentTimeMillis
-            // try to resolve a javafx bug
-            // http://stackoverflow.com/questions/23543282/why-press-command-on-mac-os-will-trigger-4-key-events
-            if (now - lastIncreaseTime > 50) {
-              lastIncreaseTime = now
-              println("++++++++++++++++++: " + font.value)
-              val v: Double = font.value.getSize
-              editor.setStyle("-fx-font-size: " + (v + 2) + "px;")
-            }
-          } else if (event.getCode == KeyCode.MINUS) {
-            println("--------------")
-            val v: Double = font.value.getSize
-            editor.setStyle("-fx-font-size: " + (v - 2) + "px;")
-          }
-        }
-      }
+    this.onKeyPressed = KeyshortHandler {
+      case Keyshorts.IncreaseFontSize =>
+        val v: Double = font.value.getSize
+        editor.setStyle("-fx-font-size: " + (v + 2) + "px;")
+      case Keyshorts.DecreaseFontSize =>
+        val v: Double = font.value.getSize
+        editor.setStyle("-fx-font-size: " + (v - 2) + "px;")
     }
   }
 
