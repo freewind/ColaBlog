@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import freewind.colablog.TextAreaSupportsPastingImage?>
+<?import freewind.colablog.controls.Editor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.HBox?>
@@ -12,11 +12,11 @@
     <children>
         <VBox prefHeight="200.0" prefWidth="100.0">
             <children>
-                <Button mnemonicParsing="false" onAction="#toggleArticlesPane" text="Articles"/>
+                <Button onAction="#toggleArticlesPane" text="Articles"/>
             </children>
         </VBox>
-        <ListView fx:id="articlesPane" prefHeight="200.0" prefWidth="200.0"/>
-        <TextAreaSupportsPastingImage
+        <ListView fx:id="articleListView" prefHeight="200.0" prefWidth="200.0" visible="false"/>
+        <Editor
                 fx:id="editor" wrapText="true"
                 prefHeight="200.0" prefWidth="200.0"/>
         <WebView fx:id="preview" prefHeight="200.0" prefWidth="200.0"/>

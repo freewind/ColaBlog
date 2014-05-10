@@ -1,15 +1,17 @@
 package freewind.colablog;
 
-import javafx.event.ActionEvent;
+import freewind.colablog.controls.Editor;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.web.WebView;
 import org.markdown4j.Markdown4jProcessor;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,20 +20,22 @@ import static java.lang.String.format;
 
 public class AppController implements Initializable {
 
+    private static final String BLOG_DIR = "/Users/freewind/blog";
+
     private static final int INIT_FONT_SIZE = 26;
 
     @FXML
-    private TextArea editor;
+    private Editor editor;
     @FXML
     private WebView preview;
     @FXML
-    private ListView articlesPane;
+    private ListView<ArticleItem> articleListView;
 
     private final Keymap keymap = new Keymap();
 
     @FXML
-    public void toggleArticlesPane(ActionEvent event) {
-        articlesPane.setVisible(!articlesPane.isVisible());
+    public void toggleArticlesPane() {
+        articleListView.setVisible(!articleListView.isVisible());
     }
 
     @Override
@@ -39,10 +43,34 @@ public class AppController implements Initializable {
         setAutoGrowControls();
         setHidableControls();
         initEditor();
+        initArticlesList();
+    }
+
+    private void initArticlesList() {
+        ObservableList<ArticleItem> items = articleListView.getItems();
+        File[] files = new File(BLOG_DIR).listFiles();
+        if (files != null) {
+            for (File file : files) {
+                String path = new File(BLOG_DIR, file.getName()).getPath();
+                items.add(new ArticleItem(path, "xxx"));
+            }
+        }
+
+        articleListView.setOnMouseClicked((event) -> {
+            if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
+                ArticleItem article = articleListView.getSelectionModel().getSelectedItem();
+                System.out.println(article);
+                try {
+                    editor.loadArticle(article);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private void setHidableControls() {
-        articlesPane.managedProperty().bind(articlesPane.visibleProperty());
+        articleListView.managedProperty().bind(articleListView.visibleProperty());
     }
 
     private void setAutoGrowControls() {
