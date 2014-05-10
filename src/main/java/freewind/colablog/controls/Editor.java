@@ -6,7 +6,6 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
 
 import javax.imageio.ImageIO;
@@ -56,10 +55,26 @@ public class Editor extends TextArea {
         syncScroll();
     }
 
+    class UserData {
+        public boolean haveSetScrollHandler = false;
+    }
+
     private void syncScroll() {
-        this.addEventFilter(ScrollEvent.ANY, (event) -> {
-            ScrollBar editorBar = getVerticalScrollBar();
-            preview.getEngine().executeScript("scrollToPercent(" + editorBar.getValue() + ")");
+        this.textProperty().addListener((event) -> {
+            ScrollBar scrollBar = getVerticalScrollBar();
+            if (scrollBar != null) {
+                UserData userData = (UserData) scrollBar.getUserData();
+                if (userData == null) {
+                    userData = new UserData();
+                    scrollBar.setUserData(userData);
+                }
+                if (!userData.haveSetScrollHandler) {
+                    scrollBar.valueProperty().addListener((e2) -> {
+                        preview.getEngine().executeScript("scrollToPercent(" + scrollBar.getValue() + ")");
+                    });
+                    userData.haveSetScrollHandler = true;
+                }
+            }
         });
     }
 
