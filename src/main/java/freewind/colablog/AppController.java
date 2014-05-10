@@ -79,6 +79,7 @@ public class AppController implements Initializable {
     }
 
     private void initEditor() {
+        editor.setPreview(preview);
         editor.setStyle("-fx-font-size: " + (INIT_FONT_SIZE + 2) + "px");
         livePreview();
         setKeyshortForFontSizeChanging();
@@ -131,6 +132,20 @@ public class AppController implements Initializable {
         return "<script>\n" +
                 "function resizeText(newFontSize) {\n" +
                 "  document.body.style.fontSize = newFontSize + \"px\";\n" +
+                "}\n" +
+                "function getDocHeight() {\n" +
+                "    return Math.max(\n" +
+                "        document.body.scrollHeight || 0, \n" +
+                "        document.documentElement.scrollHeight || 0,\n" +
+                "        document.body.offsetHeight || 0, \n" +
+                "        document.documentElement.offsetHeight || 0,\n" +
+                "        document.body.clientHeight || 0, \n" +
+                "        document.documentElement.clientHeight || 0,\n" +
+                "        0" +
+                "    );\n" +
+                "}\n" +
+                "function scrollToPercent(p) {\n" +
+                "    window.scrollTo(0,  p * getDocHeight());\n" +
                 "}\n" +
                 "</script>\n" +
                 body;
