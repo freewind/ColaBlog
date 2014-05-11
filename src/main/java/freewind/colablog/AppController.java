@@ -98,7 +98,11 @@ public class AppController implements Initializable {
         editor.setOnKeyPressed(keyEvent -> {
             KeyShort keyShort = keymap.findKeyShort(keyEvent);
             if (keyShort != null) {
-                handleKeyshort(keyShort);
+                try {
+                    handleKeyshort(keyShort);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
         editor.fontProperty().addListener((x, oldValue, newValue) -> {
@@ -109,7 +113,7 @@ public class AppController implements Initializable {
         });
     }
 
-    private void handleKeyshort(KeyShort keyShort) {
+    private void handleKeyshort(KeyShort keyShort) throws IOException {
         double fontSize = editor.fontProperty().getValue().getSize();
         System.out.println("fontSize: " + fontSize);
         switch (keyShort) {
@@ -121,6 +125,10 @@ public class AppController implements Initializable {
                 return;
             case NormalFontSize:
                 editor.setStyle("-fx-font-size: " + (INIT_FONT_SIZE - 2) + "px");
+                return;
+            case Save:
+                editor.save();
+                return;
         }
     }
 

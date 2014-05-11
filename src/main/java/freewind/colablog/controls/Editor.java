@@ -7,6 +7,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.web.WebView;
+import org.apache.commons.io.FileUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -53,6 +54,12 @@ public class Editor extends TextArea {
     public void setPreview(WebView preview) {
         this.preview = preview;
         syncScroll();
+    }
+
+    public void save() throws IOException {
+        if (currentArticle != null) {
+            FileUtils.writeStringToFile(currentArticle.getFile(), getText(), "UTF-8");
+        }
     }
 
     class UserData {

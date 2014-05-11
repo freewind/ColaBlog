@@ -6,6 +6,7 @@ public enum KeyShort {
     DecreaseFontSize,
     NormalFontSize,
     SearchInEditor,
-    Paste
+    Paste,
+    Save
 
 }

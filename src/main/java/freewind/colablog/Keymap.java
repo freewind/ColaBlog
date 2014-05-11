@@ -21,6 +21,7 @@ public class Keymap {
         mapping.put(codes(META, DIGIT0), NormalFontSize);
         mapping.put(codes(META, F), SearchInEditor);
         mapping.put(codes(META, V), Paste);
+        mapping.put(codes(META, S), Save);
     }
 
     private List<KeyCode> codes(KeyCode... codes) {
