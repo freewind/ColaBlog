@@ -13,6 +13,7 @@ dependencies {
             "org.commonjava.googlecode.markdown4j:markdown4j:2.2-cj-1.0"
     )
     testCompile(
-            'junit:junit:4.11'
+            'junit:junit:4.11',
+            'org.easytesting:fest-assert:1.4'
     )
 }

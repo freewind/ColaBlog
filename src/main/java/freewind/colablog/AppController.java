@@ -1,12 +1,15 @@
 package freewind.colablog;
 
 import freewind.colablog.controls.Editor;
+import javafx.beans.binding.Bindings;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.web.WebView;
@@ -34,8 +37,13 @@ public class AppController implements Initializable {
     private ListView<ArticleItem> articleListView;
     @FXML
     private HBox mainContainer;
+    @FXML
+    private BorderPane editorPane;
+    @FXML
+    private Label editorStatus;
 
     private final Keymap keymap = new Keymap();
+    private WordCounter wordCounter = new WordCounter();
 
     @FXML
     public void toggleArticlesPane() {
@@ -84,6 +92,7 @@ public class AppController implements Initializable {
 
     private void setAutoGrowControls() {
         HBox.setHgrow(preview, Priority.ALWAYS);
+        HBox.setHgrow(editorPane, Priority.ALWAYS);
         HBox.setHgrow(editor, Priority.ALWAYS);
     }
 
@@ -92,6 +101,10 @@ public class AppController implements Initializable {
         livePreview();
         keyshortForChangingFontSize();
         editor.textProperty().set("# title #");
+        editorStatus.textProperty().bind(Bindings.createStringBinding(
+                () -> String.valueOf(wordCounter.count(editor.getText())),
+                editor.textProperty()
+        ));
     }
 
     private void keyshortForChangingFontSize() {
