@@ -15,6 +15,7 @@
       fx:id="mainContainer">
     <VBox prefHeight="200.0" prefWidth="100.0">
         <Button onAction="#toggleArticlesPane" text="Articles"/>
+        <Button onAction="#dumpNodes" text="Dump nodes"/>
     </VBox>
     <ListView fx:id="articleListView" prefHeight="200.0" prefWidth="200.0" visible="false"/>
     <BorderPane fx:id="editorPane" prefWidth="200.0">

@@ -51,6 +51,11 @@ public class AppController implements Initializable {
     }
 
     @FXML
+    public void dumpNodes() {
+        new NodeDumper().dump(mainContainer);
+    }
+
+    @FXML
     public void applyStyle() {
         mainContainer.setStyle(myStyle.getText());
     }
