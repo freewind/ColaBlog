@@ -24,8 +24,6 @@ import static java.lang.String.format;
 
 public class AppController implements Initializable {
 
-    private static final String BLOG_DIR = "/Users/freewind/blog";
-
     private static final int INIT_FONT_SIZE = 26;
     @FXML
     private TextArea myStyle;
@@ -70,10 +68,10 @@ public class AppController implements Initializable {
 
     private void initArticlesList() {
         ObservableList<ArticleItem> items = articleListView.getItems();
-        File[] files = new File(BLOG_DIR).listFiles();
+        File[] files = App.currentBlogDir.listFiles();
         if (files != null) {
             for (File file : files) {
-                String path = new File(BLOG_DIR, file.getName()).getPath();
+                String path = new File(App.currentBlogDir, file.getName()).getPath();
                 items.add(new ArticleItem(path, "xxx"));
             }
         }
