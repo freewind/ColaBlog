@@ -9,7 +9,8 @@
 <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
       prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="freewind.colablog.AppController"
-      stylesheets="/freewind/colablog/app.css">
+      stylesheets="/freewind/colablog/app.css"
+      fx:id="mainContainer">
     <children>
         <VBox prefHeight="200.0" prefWidth="100.0">
             <children>
@@ -17,8 +18,7 @@
             </children>
         </VBox>
         <ListView fx:id="articleListView" prefHeight="200.0" prefWidth="200.0" visible="false"/>
-        <Editor
-                fx:id="editor" wrapText="true"
+        <Editor fx:id="editor" wrapText="true"
                 prefHeight="200.0" prefWidth="200.0"/>
         <WebView fx:id="preview" prefHeight="200.0" prefWidth="200.0"/>
     </children>
