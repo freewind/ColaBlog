@@ -5,6 +5,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -23,19 +24,27 @@ public class AppController implements Initializable {
     private static final String BLOG_DIR = "/Users/freewind/blog";
 
     private static final int INIT_FONT_SIZE = 26;
-
+    @FXML
+    private TextArea myStyle;
     @FXML
     private Editor editor;
     @FXML
     private WebView preview;
     @FXML
     private ListView<ArticleItem> articleListView;
+    @FXML
+    private HBox mainContainer;
 
     private final Keymap keymap = new Keymap();
 
     @FXML
     public void toggleArticlesPane() {
         articleListView.setVisible(!articleListView.isVisible());
+    }
+
+    @FXML
+    public void applyStyle() {
+        mainContainer.setStyle(myStyle.getText());
     }
 
     @Override
@@ -80,13 +89,12 @@ public class AppController implements Initializable {
 
     private void initEditor() {
         editor.setPreview(preview);
-        editor.setStyle("-fx-font-size: " + (INIT_FONT_SIZE + 2) + "px");
         livePreview();
-        setKeyshortForFontSizeChanging();
+        keyshortForChangingFontSize();
         editor.textProperty().set("# title #");
     }
 
-    private void setKeyshortForFontSizeChanging() {
+    private void keyshortForChangingFontSize() {
         editor.setOnKeyPressed(keyEvent -> {
             KeyShort keyShort = keymap.findKeyShort(keyEvent);
             if (keyShort != null) {
@@ -129,7 +137,34 @@ public class AppController implements Initializable {
     }
 
     private String fullHtml(String body) {
-        return "<script>\n" +
+        return "<style>\n" +
+                "body,div,code {\n" +
+                "  font-family: 'Hiragino Sans GB';\n" +
+                "}\n" +
+                "code {" +
+                "  border: 1px solid #eee;" +
+                "  background: #eee;" +
+//                "  padding: 3px 8px;" +
+                "}" +
+                "pre {" +
+                "  font-family: 'Hiragino Sans GB';" +
+                "  background: #eee;" +
+                "  padding: 5px 10px;" +
+                "}\n" +
+                "pre code {" +
+                "  border: 0px" +
+                "  background: #eee;" +
+                "  padding: 0px;" +
+                "}\n" +
+                "blockquote {" +
+                "  border-left: 8px solid #eee;" +
+                "  background: #f6f6f6;" +
+                "  color: #000;" +
+                "  margin: 0px;" +
+                "  padding: 2px 10px" +
+                "}\n" +
+                "</style>" +
+                "<script>\n" +
                 "function resizeText(newFontSize) {\n" +
                 "  document.body.style.fontSize = newFontSize + \"px\";\n" +
                 "}\n" +
