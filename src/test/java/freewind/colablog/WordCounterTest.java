@@ -1,5 +1,6 @@
 package freewind.colablog;
 
+import freewind.colablog.common.WordCounter;
 import org.junit.Before;
 import org.junit.Test;
 

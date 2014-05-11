@@ -1,6 +1,7 @@
 package freewind.colablog.controls;
 
-import freewind.colablog.ArticleItem;
+import freewind.colablog.common.HtmlWrapper;
+import freewind.colablog.models.Article;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextArea;
@@ -8,6 +9,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.web.WebView;
 import org.apache.commons.io.FileUtils;
+import org.markdown4j.Markdown4jProcessor;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -18,14 +20,14 @@ public class Editor extends TextArea {
 
     private WebView preview;
 
-    private ArticleItem currentArticle;
+    private Article currentArticle;
 
-    public void loadArticle(ArticleItem article) throws IOException {
+    public void loadArticle(Article article) throws IOException {
         this.currentArticle = article;
         this.textProperty().set(article.getContent());
     }
 
-    public ArticleItem getCurrentArticle() {
+    public Article getCurrentArticle() {
         return currentArticle;
     }
 
@@ -53,7 +55,20 @@ public class Editor extends TextArea {
 
     public void setPreview(WebView preview) {
         this.preview = preview;
+        livePreview();
         syncScroll();
+    }
+
+    private void livePreview() {
+        this.textProperty().addListener((observableValue, oldValue, newValue) -> {
+            try {
+                String body = markdown2html(newValue);
+                preview.getEngine().loadContent(new HtmlWrapper().full(body));
+            } catch (IOException e) {
+                // should never happen
+                e.printStackTrace();
+            }
+        });
     }
 
     public void save() throws IOException {
@@ -89,4 +104,7 @@ public class Editor extends TextArea {
         return (ScrollBar) this.lookup(".scroll-bar:vertical");
     }
 
+    private String markdown2html(String markdown) throws IOException {
+        return new Markdown4jProcessor().process(markdown);
+    }
 }

@@ -1,8 +1,11 @@
-package freewind.colablog;
+package freewind.colablog.common;
+
+import org.springframework.stereotype.Component;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Component
 public class WordCounter {
     private final Pattern pattern = Pattern.compile("[\u00ff-\uffff]|\\S+");
 

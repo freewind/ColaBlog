@@ -1,4 +1,4 @@
-package freewind.colablog;
+package freewind.colablog.common;
 
 import javafx.scene.Node;
 import javafx.scene.Parent;
@@ -10,10 +10,14 @@ public class NodeDumper {
     }
 
     private void dump(Node n, int depth) {
-        for (int i = 0; i < depth; i++) System.out.print("  ");
+        for (int i = 0; i < depth; i++) {
+            System.out.print("  ");
+        }
         System.out.println(n);
-        if (n instanceof Parent)
-            for (Node c : ((Parent) n).getChildrenUnmodifiable())
+        if (n instanceof Parent) {
+            for (Node c : ((Parent) n).getChildrenUnmodifiable()) {
                 dump(c, depth + 1);
+            }
+        }
     }
 }

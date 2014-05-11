@@ -1,16 +1,16 @@
-package freewind.colablog;
+package freewind.colablog.models;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ArticleItem {
+public class Article {
 
     private final String filePath;
     private final String title;
 
-    public ArticleItem(String filePath, String title) {
+    public Article(String filePath, String title) {
         this.filePath = filePath;
         this.title = title;
     }

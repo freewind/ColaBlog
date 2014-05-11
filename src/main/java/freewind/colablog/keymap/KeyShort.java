@@ -1,4 +1,4 @@
-package freewind.colablog;
+package freewind.colablog.keymap;
 
 public enum KeyShort {
 
