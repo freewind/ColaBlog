@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class App extends Application {
@@ -13,7 +14,8 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/freewind/colablog/app.fxml"));
         primaryStage.setTitle("Hello, ColaBlog");
-        primaryStage.setScene(new Scene(root, 800, 600));
+        Screen screen = Screen.getPrimary();
+        primaryStage.setScene(new Scene(root, screen.getBounds().getWidth(), screen.getBounds().getHeight()));
         primaryStage.show();
         dump(root);
     }
