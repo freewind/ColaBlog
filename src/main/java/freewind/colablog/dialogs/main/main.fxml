@@ -12,9 +12,11 @@
       fx:id="mainContainer">
     <VBox prefHeight="200.0" prefWidth="100.0">
         <Button onAction="#toggleArticlesPane" text="Articles"/>
+        <Button onAction="#toggleFontPane" text="Font"/>
         <Button onAction="#dumpNodes" text="Dump nodes"/>
     </VBox>
     <ListView fx:id="articleListView" prefHeight="200.0" prefWidth="200.0" visible="false"/>
+    <ListView fx:id="fontListView" prefHeight="200.0" prefWidth="200.0" visible="false"/>
     <fx:include fx:id="editorPane" source="editor.fxml" prefWidth="200.0" prefHeight="200.0"/>
     <WebView fx:id="preview" prefHeight="200.0" prefWidth="200.0"/>
 </HBox>

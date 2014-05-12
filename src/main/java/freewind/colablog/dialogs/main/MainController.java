@@ -15,6 +15,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
 import javafx.scene.web.WebView;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.markdown4j.Markdown4jProcessor;
@@ -42,10 +43,17 @@ public class MainController implements SpringController {
     private Keymap keymap;
     @FXML
     private EditorController editorPaneController;
+    @FXML
+    private ListView<String> fontListView;
 
     @FXML
     public void toggleArticlesPane() {
         articleListView.setVisible(!articleListView.isVisible());
+    }
+
+    @FXML
+    public void toggleFontPane() {
+        fontListView.setVisible(!fontListView.isVisible());
     }
 
     @FXML
@@ -58,16 +66,27 @@ public class MainController implements SpringController {
         uiSettings();
         editorFontChangeTriggersPreview();
         loadArticleList();
+        loadAvailableFonts();
         showArticleWhenClick();
         savePastingImage();
         livePreview();
         syncScroll();
     }
 
+    private void loadAvailableFonts() {
+        fontListView.getItems().addAll(Font.getFamilies());
+        fontListView.setOnMouseClicked((event) -> {
+            String fontName = fontListView.getSelectionModel().getSelectedItem();
+            System.out.println(fontName);
+            getEditor().setStyle("-fx-font-family: '" + fontName + "'");
+        });
+    }
+
     private void uiSettings() {
         HBox.setHgrow(preview, Priority.ALWAYS);
         HBox.setHgrow(editorPane, Priority.ALWAYS);
         articleListView.managedProperty().bind(articleListView.visibleProperty());
+        fontListView.managedProperty().bind(fontListView.visibleProperty());
     }
 
     private void syncScroll() {
