@@ -1,24 +1,23 @@
 package freewind.colablog.dialogs.main;
 
 import freewind.colablog.AppInfo;
+import freewind.colablog.common.HtmlWrapper;
 import freewind.colablog.common.NodeDumper;
-import freewind.colablog.common.WordCounter;
 import freewind.colablog.controls.Editor;
-import freewind.colablog.keymap.KeyShort;
 import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
-import freewind.colablog.spring.AutowireFXMLDialog;
-import freewind.colablog.spring.PostInitController;
-import javafx.beans.binding.Bindings;
+import freewind.colablog.spring.SpringController;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.web.WebView;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.markdown4j.Markdown4jProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -27,30 +26,22 @@ import java.util.Arrays;
 
 import static java.lang.String.format;
 
-public class MainController implements PostInitController {
+public class MainController implements SpringController {
 
     @Autowired
     private AppInfo appInfo;
     @FXML
-    private Editor editor;
+    private BorderPane editorPane;
     @FXML
     private WebView preview;
     @FXML
     private ListView<Article> articleListView;
     @FXML
     private HBox mainContainer;
-    @FXML
-    private BorderPane editorPane;
-    @FXML
-    private Label editorStatus;
     @Autowired
     private Keymap keymap;
-    @Autowired
-    private WordCounter wordCounter;
-
-    private AutowireFXMLDialog autowireFXMLDialog;
-
-    private Double initFontSize;
+    @FXML
+    private EditorController editorPaneController;
 
     @FXML
     public void toggleArticlesPane() {
@@ -64,22 +55,59 @@ public class MainController implements PostInitController {
 
     @Override
     public void postInit() {
-        setAutoGrowControls();
-        setHidableControls();
-        initEditor();
+        uiSettings();
+        editorFontChangeTriggersPreview();
         loadArticleList();
         showArticleWhenClick();
+        savePastingImage();
+        livePreview();
+        syncScroll();
+    }
+
+    private void uiSettings() {
+        HBox.setHgrow(preview, Priority.ALWAYS);
+        HBox.setHgrow(editorPane, Priority.ALWAYS);
+        articleListView.managedProperty().bind(articleListView.visibleProperty());
+    }
+
+    private void syncScroll() {
+        final MutableBoolean haveSetScrollHandler = new MutableBoolean(false);
+        getEditor().textProperty().addListener((event) -> {
+            ScrollBar scrollBar = getEditor().getVerticalScrollBar();
+            if (scrollBar != null) {
+                if (haveSetScrollHandler.isFalse()) {
+                    scrollBar.valueProperty().addListener((e2) -> {
+                        preview.getEngine().executeScript("scrollToPercent(" + scrollBar.getValue() + ")");
+                    });
+                    haveSetScrollHandler.setValue(true);
+                }
+            }
+        });
+    }
+
+    private void livePreview() {
+        getEditor().textProperty().addListener((observableValue, oldValue, newValue) -> {
+            String body = markdown2html(newValue);
+            preview.getEngine().loadContent(new HtmlWrapper().full(body));
+        });
+    }
+
+    private String markdown2html(String markdown) {
+        try {
+            return new Markdown4jProcessor().process(markdown);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void savePastingImage() {
+        getEditor().setClipboardPastingHandler(new ClipboardImagePastingHandler());
     }
 
     private void showArticleWhenClick() {
         articleListView.setOnMouseClicked((event) -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                Article article = articleListView.getSelectionModel().getSelectedItem();
-                try {
-                    editor.loadArticle(article);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                editorPaneController.loadArticle(articleListView.getSelectionModel().getSelectedItem());
             }
         });
     }
@@ -95,38 +123,8 @@ public class MainController implements PostInitController {
         }
     }
 
-    private void setHidableControls() {
-        articleListView.managedProperty().bind(articleListView.visibleProperty());
-    }
-
-    private void setAutoGrowControls() {
-        HBox.setHgrow(preview, Priority.ALWAYS);
-        HBox.setHgrow(editorPane, Priority.ALWAYS);
-        HBox.setHgrow(editor, Priority.ALWAYS);
-    }
-
-    private void initEditor() {
-        editor.setPreview(preview);
-        keyshortForChangingFontSize();
-        editor.textProperty().set("# title #");
-        editorStatus.textProperty().bind(Bindings.createStringBinding(
-                () -> String.valueOf(wordCounter.count(editor.getText())),
-                editor.textProperty()
-        ));
-    }
-
-    private void keyshortForChangingFontSize() {
-        editor.setOnKeyPressed(keyEvent -> {
-            KeyShort keyShort = keymap.findKeyShort(keyEvent);
-            if (keyShort != null) {
-                try {
-                    handleKeyshort(keyShort);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-        editor.fontProperty().addListener((x, oldValue, newValue) -> {
+    private void editorFontChangeTriggersPreview() {
+        getEditor().fontProperty().addListener((x, oldValue, newValue) -> {
             if (preview.getEngine().getDocument() != null) {
                 String cmd = format("resizeText(%s)", newValue.getSize());
                 preview.getEngine().executeScript(cmd);
@@ -134,30 +132,7 @@ public class MainController implements PostInitController {
         });
     }
 
-    private void handleKeyshort(KeyShort keyShort) throws IOException {
-        double fontSize = editor.fontProperty().getValue().getSize();
-        switch (keyShort) {
-            case IncreaseFontSize:
-                if (initFontSize == null) {
-                    initFontSize = fontSize;
-                }
-                editor.setStyle("-fx-font-size: " + (fontSize + 2) + "px");
-                return;
-            case DecreaseFontSize:
-                if (initFontSize == null) {
-                    initFontSize = fontSize;
-                }
-                editor.setStyle("-fx-font-size: " + (fontSize - 2) + "px");
-                return;
-            case NormalFontSize:
-                if (initFontSize != null) {
-                    editor.setStyle("-fx-font-size: " + initFontSize + "px");
-                }
-                return;
-            case Save:
-                editor.save();
-                return;
-        }
+    private Editor getEditor() {
+        return editorPaneController.getEditor();
     }
-
 }

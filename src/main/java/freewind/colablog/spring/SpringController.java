@@ -1,6 +1,6 @@
 package freewind.colablog.spring;
 
-public interface PostInitController {
+public interface SpringController {
 
     void postInit();
 

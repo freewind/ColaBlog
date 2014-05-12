@@ -23,8 +23,12 @@ public class Article {
         return new File(filePath);
     }
 
-    public String getContent() throws IOException {
-        return FileUtils.readFileToString(getFile(), "UTF-8");
+    public String getContent() {
+        try {
+            return FileUtils.readFileToString(getFile(), "UTF-8");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public String getTitle() {

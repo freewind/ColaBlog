@@ -1,5 +1,6 @@
 package freewind.colablog.spring;
 
+import com.google.common.collect.Lists;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
@@ -12,14 +13,16 @@ import org.springframework.context.ApplicationContext;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.List;
 
 public class AutowireFXMLDialog extends Stage {
 
     @Autowired
     private ApplicationContext context;
 
-    private Object controller;
+    private SpringController controller;
 
     public AutowireFXMLDialog(URL fxml, Window owner) {
         this(fxml, owner, StageStyle.DECORATED);
@@ -33,20 +36,42 @@ public class AutowireFXMLDialog extends Stage {
         try {
             setScene(new Scene(loader.load()));
             controller = loader.getController();
-            if (controller instanceof DialogController) {
-                ((DialogController) controller).setDialog(this);
+            List<SpringController> controllers = Lists.newArrayList();
+            findAllControllers(controller, controllers);
+            for (SpringController ctrl : controllers) {
+                if (ctrl instanceof DialogController) {
+                    ((DialogController) ctrl).setDialog(this);
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    @PostConstruct
-    private void postConstruct() {
-        context.getAutowireCapableBeanFactory()
-                .autowireBeanProperties(controller, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
-        if (controller instanceof PostInitController) {
-            ((PostInitController) controller).postInit();
+    private void findAllControllers(SpringController controller, List<SpringController> controllers) {
+        controllers.add(controller);
+        for (Field field : controller.getClass().getDeclaredFields()) {
+            field.setAccessible(true);
+            try {
+                Object value = field.get(controller);
+                if (value instanceof SpringController) {
+                    findAllControllers((SpringController) value, controllers);
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
+
+    @PostConstruct
+    private void postConstruct() {
+        List<SpringController> controllers = Lists.newArrayList();
+        findAllControllers(controller, controllers);
+        for (SpringController ctrl : controllers) {
+            context.getAutowireCapableBeanFactory()
+                    .autowireBeanProperties(ctrl, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
+            ctrl.postInit();
+        }
+    }
+
 }

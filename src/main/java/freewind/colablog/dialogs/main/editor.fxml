@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import freewind.colablog.controls.Editor?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1"
+            fx:id="editorPane" fx:controller="freewind.colablog.dialogs.main.EditorController">
+    <center>
+        <Editor fx:id="editor" wrapText="true"/>
+    </center>
+    <bottom>
+        <Label fx:id="editorStatus" text="Hello"/>
+    </bottom>
+</BorderPane>

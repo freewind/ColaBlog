@@ -4,9 +4,8 @@ import freewind.colablog.AppInfo;
 import freewind.colablog.config.SystemConfig;
 import freewind.colablog.spring.AutowireFXMLDialog;
 import freewind.colablog.spring.DialogController;
-import freewind.colablog.spring.PostInitController;
 import freewind.colablog.spring.ScreensConfiguration;
-import javafx.event.ActionEvent;
+import freewind.colablog.spring.SpringController;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
@@ -16,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.IOException;
 
-public class StartController implements PostInitController, DialogController {
+public class StartController implements SpringController, DialogController {
 
     @Autowired
     private AppInfo appInfo;
@@ -32,7 +31,7 @@ public class StartController implements PostInitController, DialogController {
 
     private AutowireFXMLDialog autowireFXMLDialog;
 
-    public void chooseDirectory(ActionEvent actionEvent) throws IOException {
+    public void chooseDirectory() throws IOException {
         DirectoryChooser chooser = new DirectoryChooser();
         chooser.setTitle("Choose the blog root directory");
         File selectedDirectory = chooser.showDialog(null);
@@ -42,12 +41,6 @@ public class StartController implements PostInitController, DialogController {
             systemConfig.save();
             switchToMainDialog();
         }
-    }
-
-
-    @Override
-    public void setDialog(AutowireFXMLDialog autowireFXMLDialog) {
-        this.autowireFXMLDialog = autowireFXMLDialog;
     }
 
     @Override
@@ -66,5 +59,10 @@ public class StartController implements PostInitController, DialogController {
     private void switchToMainDialog() {
         autowireFXMLDialog.close();
         screens.mainDialog().show();
+    }
+
+    @Override
+    public void setDialog(AutowireFXMLDialog autowireFXMLDialog) {
+        this.autowireFXMLDialog = autowireFXMLDialog;
     }
 }
