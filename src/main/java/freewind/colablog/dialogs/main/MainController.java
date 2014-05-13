@@ -132,12 +132,11 @@ public class MainController implements SpringController {
     }
 
     private void loadArticleList() {
-        File[] files = appInfo.getCurrentBlogDir().listFiles();
+        File[] files = appInfo.getBlogStructure().getArticles();
         if (files != null) {
             ObservableList<Article> items = articleListView.getItems();
             Arrays.asList(files).stream()
-                    .map((file) -> new File(appInfo.getCurrentBlogDir(), file.getName()))
-                    .map((file) -> new Article(file.getPath(), "xxx"))
+                    .map(Article::new)
                     .forEach(items::add);
         }
     }

@@ -8,16 +8,14 @@ import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
 import freewind.colablog.spring.AutowireFXMLDialog;
 import freewind.colablog.spring.SpringController;
+import freewind.colablog.utils.IO;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.io.IOException;
 
 public class EditorController implements SpringController {
 
@@ -70,16 +68,12 @@ public class EditorController implements SpringController {
             KeyShort keyShort = keymap.findKeyShort(keyEvent);
             System.out.println("######### keyshort: " + keyShort);
             if (keyShort != null) {
-                try {
-                    handleKeyshort(keyShort);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                handleKeyshort(keyShort);
             }
         });
     }
 
-    private void handleKeyshort(KeyShort keyShort) throws IOException {
+    private void handleKeyshort(KeyShort keyShort) {
         double fontSize = editor.fontProperty().getValue().getSize();
         switch (keyShort) {
             case IncreaseFontSize:
@@ -106,9 +100,10 @@ public class EditorController implements SpringController {
         }
     }
 
-    public void save() throws IOException {
+    public void save() {
         if (currentArticle != null) {
-            FileUtils.writeStringToFile(currentArticle.getFile(), editor.getText(), "UTF-8");
+            currentArticle.setContent(editor.getText());
+            IO.writeStringToFile(currentArticle.getFile(), currentArticle.getFullContent());
             System.out.println("saved!");
         }
     }
