@@ -2,6 +2,7 @@ package freewind.colablog.dialogs.main;
 
 import freewind.colablog.AppInfo;
 import freewind.colablog.common.WordCounter;
+import freewind.colablog.controls.ClipboardPastingHandler;
 import freewind.colablog.controls.Editor;
 import freewind.colablog.keymap.KeyShort;
 import freewind.colablog.keymap.Keymap;
@@ -10,12 +11,23 @@ import freewind.colablog.spring.AutowireFXMLDialog;
 import freewind.colablog.spring.SpringController;
 import freewind.colablog.utils.IO;
 import javafx.beans.binding.Bindings;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class EditorController implements SpringController {
 
@@ -42,8 +54,13 @@ public class EditorController implements SpringController {
         System.out.println("############ postInit!");
         uiSettings();
         keyshortForChangingFontSize();
+        savePastingImage();
         countWord();
         defaultCotnent();
+    }
+
+    private void savePastingImage() {
+        getEditor().setClipboardPastingHandler(new ClipboardImagePastingHandler());
     }
 
     private void defaultCotnent() {
@@ -116,6 +133,42 @@ public class EditorController implements SpringController {
         this.currentArticle = currentArticle;
         this.getEditor().textProperty().set(currentArticle.getContent());
         System.out.println("####### currentAritcle: " + currentArticle);
+    }
+
+    private class ClipboardImagePastingHandler implements ClipboardPastingHandler {
+
+        @Override
+        public boolean handle(Clipboard clipboard) {
+            if (clipboard.hasImage()) {
+                try {
+                    File imageFile = saveImageToFile(clipboard);
+                    String s = "file:" + imageFile.getAbsolutePath();
+                    String imageTag = "![" + imageFile.getName() + "](" + s + ")";
+
+                    getEditor().insertText(getEditor().getAnchor(), imageTag);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private File saveImageToFile(Clipboard clipboard) throws IOException {
+            Image image = clipboard.getImage();
+            BufferedImage bufferedImage = SwingFXUtils.fromFXImage(image, null);
+            File imagesDir = appInfo.getBlogStructure().getImagesDir();
+            FileUtils.forceMkdir(imagesDir);
+            File targetFile = new File(imagesDir, newImageFileName(imagesDir));
+            ImageIO.write(bufferedImage, "png", targetFile);
+            return targetFile;
+        }
+
+        private String newImageFileName(File imagesDir) {
+            return String.format("%s_%s.png",
+                    new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date()),
+                    imagesDir.list().length + 1);
+        }
     }
 
 }

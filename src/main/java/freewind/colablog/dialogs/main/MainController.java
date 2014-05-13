@@ -69,7 +69,6 @@ public class MainController implements SpringController {
         loadArticleList();
         loadAvailableFonts();
         showArticleWhenClick();
-        savePastingImage();
         livePreview();
         syncScroll();
     }
@@ -108,7 +107,9 @@ public class MainController implements SpringController {
     private void livePreview() {
         getEditor().textProperty().addListener((observableValue, oldValue, newValue) -> {
             String body = markdown2html(newValue);
-            preview.getEngine().loadContent(new HtmlWrapper().full(body));
+            String html = new HtmlWrapper().full(body);
+            System.out.println(html);
+            preview.getEngine().loadContent(html);
         });
     }
 
@@ -118,10 +119,6 @@ public class MainController implements SpringController {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private void savePastingImage() {
-        getEditor().setClipboardPastingHandler(new ClipboardImagePastingHandler());
     }
 
     private void showArticleWhenClick() {
@@ -159,4 +156,5 @@ public class MainController implements SpringController {
     public void generateSite() {
         new SiteGenerator(appInfo.getBlogStructure()).generate();
     }
+
 }

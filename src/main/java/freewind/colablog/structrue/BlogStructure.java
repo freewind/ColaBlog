@@ -33,5 +33,13 @@ public class BlogStructure {
     public File getGenerateDir() {
         return new File(root, "_generated");
     }
+
+    public File getImagesDir() {
+        return new File(root, "images");
+    }
+
+    public File getRoot() {
+        return root;
+    }
 }
 
