@@ -3,11 +3,9 @@ package freewind.colablog.common;
 import freewind.colablog.models.Article;
 import freewind.colablog.structrue.BlogStructure;
 import freewind.colablog.utils.IO;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
-import java.io.IOException;
 
 public class SiteGenerator {
 
