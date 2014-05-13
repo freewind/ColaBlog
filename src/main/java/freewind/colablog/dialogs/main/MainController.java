@@ -3,6 +3,7 @@ package freewind.colablog.dialogs.main;
 import freewind.colablog.AppInfo;
 import freewind.colablog.common.HtmlWrapper;
 import freewind.colablog.common.NodeDumper;
+import freewind.colablog.common.SiteGenerator;
 import freewind.colablog.controls.Editor;
 import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
@@ -152,5 +153,10 @@ public class MainController implements SpringController {
 
     private Editor getEditor() {
         return editorPaneController.getEditor();
+    }
+
+    @FXML
+    public void generateSite() {
+        new SiteGenerator(appInfo.getBlogStructure()).generate();
     }
 }
