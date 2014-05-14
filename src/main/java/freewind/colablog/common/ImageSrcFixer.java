@@ -17,14 +17,14 @@ public class ImageSrcFixer {
     private AppInfo appInfo;
 
     public String fixToLocal(String html) {
-        return xxx(html, (src) -> "file:" + appInfo.getBlogStructure().getRoot() + src);
+        return resolveImageSrc(html, (src) -> "file:" + appInfo.getBlogStructure().getRoot() + src);
     }
 
     public String fixToUrl(String html) {
-        return xxx(html, (src) -> src);
+        return resolveImageSrc(html, (src) -> src);
     }
 
-    private String xxx(String html, Function<String, String> handle) {
+    private String resolveImageSrc(String html, Function<String, String> handle) {
         Document doc = Jsoup.parse(html);
         Elements imgs = doc.select("img");
         for (Element img : imgs) {
