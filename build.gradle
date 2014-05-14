@@ -15,7 +15,8 @@ dependencies {
             "org.springframework:spring-context:4.0.4.RELEASE",
             "org.springframework:spring-beans:4.0.4.RELEASE",
             "org.jsoup:jsoup:1.7.3",
-            "org.controlsfx:controlsfx:8.0.5"
+            "org.controlsfx:controlsfx:8.0.5",
+            "org.apache.velocity:velocity:1.7"
     )
     testCompile(
             'junit:junit:4.11',

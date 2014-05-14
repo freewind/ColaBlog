@@ -44,4 +44,12 @@ public class ImageSrcFixerTest {
         String fixed = fixer.fixToUrl("hello, <img src='/images/aaa.png' />");
         assertThat(fixed).contains("<img src=\"/images/aaa.png\" />");
     }
+
+    @Test
+    public void should_not_add_html_head_body_tags() throws Exception {
+        String fixed = fixer.fixToUrl("hello, <img src='/images/aaa.png' />");
+        assertThat(fixed).doesNotContain("<html>");
+        assertThat(fixed).doesNotContain("<head>");
+        assertThat(fixed).doesNotContain("<body>");
+    }
 }

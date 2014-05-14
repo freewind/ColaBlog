@@ -1,6 +1,7 @@
 package freewind.colablog.common;
 
 import freewind.colablog.AppInfo;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -33,7 +34,13 @@ public class ImageSrcFixer {
                 img.attr("src", handle.apply(src));
             }
         }
-        return doc.toString();
+        return removeBodyTag(doc.body().toString());
+    }
+
+    private String removeBodyTag(String fixed) {
+        fixed = StringUtils.removeStart(fixed, "<body>");
+        fixed = StringUtils.removeEnd(fixed, "</body>");
+        return fixed;
     }
 
     public void setAppInfo(AppInfo appInfo) {

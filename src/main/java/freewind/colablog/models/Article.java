@@ -1,6 +1,8 @@
 package freewind.colablog.models;
 
 import com.google.common.collect.Lists;
+import freewind.colablog.common.ImageSrcFixer;
+import freewind.colablog.common.MarkdownConverter;
 import freewind.colablog.utils.IO;
 import org.apache.commons.lang3.StringUtils;
 
@@ -88,6 +90,23 @@ public class Article {
 
     public String getContent() {
         return content.trim();
+    }
+
+    public String getBody() {
+        List<String> lines = IO.readLines(getContent());
+        lines.remove(0);
+        String text = StringUtils.join(lines, "\n");
+        return text.trim();
+    }
+
+    public String getBodyAsLocalHtml() {
+        String html = new MarkdownConverter().toHtml(getBody());
+        return new ImageSrcFixer().fixToLocal(html);
+    }
+
+    public String getBodyAsHtml() {
+        String html = new MarkdownConverter().toHtml(getBody());
+        return new ImageSrcFixer().fixToUrl(html);
     }
 
     public String getFullContent() {

@@ -43,5 +43,13 @@ public class BlogStructure {
     public File getRoot() {
         return root;
     }
+
+    public File getTemplate(String filename) {
+        return new File(getTemplatesDir(), filename);
+    }
+
+    public File getTemplatesDir() {
+        return new File(root, "templates");
+    }
 }
 
