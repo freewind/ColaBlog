@@ -15,6 +15,8 @@ import java.io.File;
  */
 public class BlogStructure {
 
+    public static final String IMAGES_DIR_NAME = "images";
+
     private File root;
 
     public BlogStructure(File root) {
@@ -35,7 +37,7 @@ public class BlogStructure {
     }
 
     public File getImagesDir() {
-        return new File(root, "images");
+        return new File(root, IMAGES_DIR_NAME);
     }
 
     public File getRoot() {

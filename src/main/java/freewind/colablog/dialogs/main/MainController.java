@@ -2,6 +2,7 @@ package freewind.colablog.dialogs.main;
 
 import freewind.colablog.AppInfo;
 import freewind.colablog.common.HtmlWrapper;
+import freewind.colablog.common.ImageSrcFixer;
 import freewind.colablog.common.NodeDumper;
 import freewind.colablog.common.SiteGenerator;
 import freewind.colablog.controls.Editor;
@@ -32,6 +33,8 @@ public class MainController implements SpringController {
 
     @Autowired
     private AppInfo appInfo;
+    @Autowired
+    private ImageSrcFixer imageSrcFixer;
     @FXML
     private BorderPane editorPane;
     @FXML
@@ -108,8 +111,9 @@ public class MainController implements SpringController {
         getEditor().textProperty().addListener((observableValue, oldValue, newValue) -> {
             String body = markdown2html(newValue);
             String html = new HtmlWrapper().full(body);
-            System.out.println(html);
-            preview.getEngine().loadContent(html);
+            String imageFixed = imageSrcFixer.fixToLocal(html);
+            System.out.println(imageFixed);
+            preview.getEngine().loadContent(imageFixed);
         });
     }
 

@@ -9,6 +9,7 @@ import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
 import freewind.colablog.spring.AutowireFXMLDialog;
 import freewind.colablog.spring.SpringController;
+import freewind.colablog.structrue.BlogStructure;
 import freewind.colablog.utils.IO;
 import javafx.beans.binding.Bindings;
 import javafx.embed.swing.SwingFXUtils;
@@ -142,8 +143,8 @@ public class EditorController implements SpringController {
             if (clipboard.hasImage()) {
                 try {
                     File imageFile = saveImageToFile(clipboard);
-                    String s = "file:" + imageFile.getAbsolutePath();
-                    String imageTag = "![" + imageFile.getName() + "](" + s + ")";
+                    String path = String.format("/%s/%s", BlogStructure.IMAGES_DIR_NAME, imageFile.getName());
+                    String imageTag = "![" + imageFile.getName() + "](" + path + ")";
 
                     getEditor().insertText(getEditor().getAnchor(), imageTag);
                 } catch (IOException e) {

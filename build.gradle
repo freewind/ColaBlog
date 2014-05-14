@@ -13,7 +13,8 @@ dependencies {
             "org.commonjava.googlecode.markdown4j:markdown4j:2.2-cj-1.0",
             "org.yaml:snakeyaml:1.13",
             "org.springframework:spring-context:4.0.4.RELEASE",
-            "org.springframework:spring-beans:4.0.4.RELEASE"
+            "org.springframework:spring-beans:4.0.4.RELEASE",
+            "org.jsoup:jsoup:1.7.3"
     )
     testCompile(
             'junit:junit:4.11',

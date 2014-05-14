@@ -24,7 +24,8 @@ public class SiteGenerator {
             Article article = new Article(file);
             File targetFile = new File(targetDir, targetHtmlFileName(article));
             String html = new MarkdownConverter().toHtml(article.getContent());
-            IO.writeStringToFile(targetFile, html);
+            String imageSrcFixed = new ImageSrcFixer().fixToUrl(html);
+            IO.writeStringToFile(targetFile, imageSrcFixed);
         }
         System.out.println("Generated " + articles.length + " files!");
     }
