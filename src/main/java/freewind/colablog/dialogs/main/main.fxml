@@ -12,6 +12,7 @@
       fx:id="mainContainer">
     <VBox prefHeight="200.0" prefWidth="100.0">
         <Button onAction="#toggleArticlesPane" text="Articles"/>
+        <Button onAction="#createNewArticle" text="New Article"/>
         <Button onAction="#toggleFontPane" text="Font"/>
         <Button onAction="#dumpNodes" text="Dump nodes"/>
         <Button onAction="#generateSite" text="Generate"/>

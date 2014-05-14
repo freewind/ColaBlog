@@ -14,10 +14,17 @@ dependencies {
             "org.yaml:snakeyaml:1.13",
             "org.springframework:spring-context:4.0.4.RELEASE",
             "org.springframework:spring-beans:4.0.4.RELEASE",
-            "org.jsoup:jsoup:1.7.3"
+            "org.jsoup:jsoup:1.7.3",
+            "org.controlsfx:controlsfx:8.0.5"
     )
     testCompile(
             'junit:junit:4.11',
             'org.easytesting:fest-assert:1.4'
     )
+}
+
+idea {
+    module {
+        jdkName = '1.8_05'
+    }
 }

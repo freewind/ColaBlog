@@ -6,11 +6,9 @@ import freewind.colablog.controls.ClipboardPastingHandler;
 import freewind.colablog.controls.Editor;
 import freewind.colablog.keymap.KeyShort;
 import freewind.colablog.keymap.Keymap;
-import freewind.colablog.models.Article;
 import freewind.colablog.spring.AutowireFXMLDialog;
 import freewind.colablog.spring.SpringController;
 import freewind.colablog.structrue.BlogStructure;
-import freewind.colablog.utils.IO;
 import javafx.beans.binding.Bindings;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
@@ -48,10 +46,10 @@ public class EditorController implements SpringController {
     private AutowireFXMLDialog autowireFXMLDialog;
 
     private Double initFontSize;
-    private Article currentArticle;
 
     @Override
     public void postInit() {
+        getEditor().setBlogStructure(appInfo.getBlogStructure());
         System.out.println("############ postInit!");
         uiSettings();
         keyshortForChangingFontSize();
@@ -113,27 +111,14 @@ public class EditorController implements SpringController {
                 return;
             case Save:
                 System.out.println("####### pressed Save");
-                save();
+                getEditor().save();
                 return;
         }
     }
 
-    public void save() {
-        if (currentArticle != null) {
-            currentArticle.setContent(editor.getText());
-            IO.writeStringToFile(currentArticle.getFile(), currentArticle.getFullContent());
-            System.out.println("saved!");
-        }
-    }
 
     public Editor getEditor() {
         return editor;
-    }
-
-    public void loadArticle(Article currentArticle) {
-        this.currentArticle = currentArticle;
-        this.getEditor().textProperty().set(currentArticle.getContent());
-        System.out.println("####### currentAritcle: " + currentArticle);
     }
 
     private class ClipboardImagePastingHandler implements ClipboardPastingHandler {

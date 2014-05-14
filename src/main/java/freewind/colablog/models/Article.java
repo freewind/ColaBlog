@@ -133,4 +133,11 @@ public class Article {
         return getFile().getName();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Article) {
+            return this.file.equals(((Article) obj).file);
+        }
+        return false;
+    }
 }

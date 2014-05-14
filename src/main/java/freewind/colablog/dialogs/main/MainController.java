@@ -8,8 +8,9 @@ import freewind.colablog.common.SiteGenerator;
 import freewind.colablog.controls.Editor;
 import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
+import freewind.colablog.models.Articles;
 import freewind.colablog.spring.SpringController;
-import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
@@ -25,7 +26,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
 
 import static java.lang.String.format;
 
@@ -49,6 +49,8 @@ public class MainController implements SpringController {
     private EditorController editorPaneController;
     @FXML
     private ListView<String> fontListView;
+    @Autowired
+    private Articles articles;
 
     @FXML
     public void toggleArticlesPane() {
@@ -67,6 +69,7 @@ public class MainController implements SpringController {
 
     @Override
     public void postInit() {
+        getEditor().setArticles(articles);
         uiSettings();
         editorFontChangeTriggersPreview();
         loadArticleList();
@@ -128,18 +131,21 @@ public class MainController implements SpringController {
     private void showArticleWhenClick() {
         articleListView.setOnMouseClicked((event) -> {
             if (event.getButton() == MouseButton.PRIMARY && event.getClickCount() == 2) {
-                editorPaneController.loadArticle(articleListView.getSelectionModel().getSelectedItem());
+                getEditor().loadArticle(articleListView.getSelectionModel().getSelectedItem());
             }
         });
     }
 
     private void loadArticleList() {
-        File[] files = appInfo.getBlogStructure().getArticles();
-        if (files != null) {
-            ObservableList<Article> items = articleListView.getItems();
-            Arrays.asList(files).stream()
-                    .map(Article::new)
-                    .forEach(items::add);
+        articles.addListener((change) -> {
+            if (change.next()) {
+                for (Article article : change.getAddedSubList()) {
+                    articleListView.getItems().add(article);
+                }
+            }
+        });
+        for (File file : appInfo.getBlogStructure().getArticles()) {
+            articles.add(new Article(file));
         }
     }
 
@@ -161,4 +167,7 @@ public class MainController implements SpringController {
         new SiteGenerator(appInfo.getBlogStructure()).generate();
     }
 
+    public void createNewArticle() {
+        getEditor().newArticle();
+    }
 }
