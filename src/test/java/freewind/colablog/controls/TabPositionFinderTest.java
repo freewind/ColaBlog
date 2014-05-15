@@ -31,8 +31,7 @@ public class TabPositionFinderTest {
     @Test
     public void should_ignore_last_line_separator_if_selection_ends_with_that() {
         List<Integer> positions = findPositions("c\ndef\n");
-        assertThat(positions).containsOnly(0, 4);
-        // not contain 8
+        assertThat(positions).excludes(8);
     }
 
     @Test
