@@ -1,28 +1,90 @@
 package freewind.colablog.controls;
 
+import freewind.colablog.keymap.KeyShort;
+import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
 import freewind.colablog.models.Articles;
+import freewind.colablog.spring.SpringInjectable;
 import freewind.colablog.structrue.BlogStructure;
 import freewind.colablog.utils.IO;
-import javafx.scene.control.*;
+import javafx.scene.control.IndexRange;
+import javafx.scene.control.ScrollBar;
+import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
+import javafx.scene.input.KeyEvent;
 import org.controlsfx.dialog.Dialogs;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
-public class Editor extends TextArea {
+public class Editor extends TextArea implements SpringInjectable {
 
+    public static final String TAB_SPACES = "    ";
     private Article currentArticle;
 
     private ClipboardPastingHandler clipboardPastingHandler;
 
     private BlogStructure blogStructure;
     private Articles articles;
+    private Double initFontSize;
+
+    @Autowired
+    private Keymap keymap;
 
     public void setClipboardPastingHandler(ClipboardPastingHandler clipboardPastingHandler) {
         this.clipboardPastingHandler = clipboardPastingHandler;
+    }
+
+    private void setKeyshortHanlers() {
+        this.setOnKeyPressed(keyEvent -> {
+            System.out.println(keyEvent);
+            KeyShort keyShort = keymap.findKeyShort(keyEvent);
+            if (keyShort != null) {
+                handleKeyshort(keyShort, keyEvent);
+            }
+        });
+    }
+
+    private void handleKeyshort(KeyShort keyShort, KeyEvent keyEvent) {
+        double fontSize = this.fontProperty().getValue().getSize();
+        switch (keyShort) {
+            case IncreaseFontSize:
+                if (initFontSize == null) {
+                    initFontSize = fontSize;
+                }
+                this.setStyle("-fx-font-size: " + (fontSize + 2) + "px");
+                return;
+            case DecreaseFontSize:
+                if (initFontSize == null) {
+                    initFontSize = fontSize;
+                }
+                this.setStyle("-fx-font-size: " + (fontSize - 2) + "px");
+                return;
+            case NormalFontSize:
+                if (initFontSize != null) {
+                    this.setStyle("-fx-font-size: " + initFontSize + "px");
+                }
+                return;
+            case Save:
+                System.out.println("####### pressed Save");
+                this.save();
+                return;
+            case Tab:
+                keyEvent.consume();
+                IndexRange selection = getSelection();
+                if (selection.getLength() == 0) {
+                    this.insertText(getAnchor(), TAB_SPACES);
+                } else {
+                    List<Integer> lineSeparatorPositions = new TabPositionFinder(selection, getText()).find();
+                    System.out.println(lineSeparatorPositions.size());
+                    for (int position : lineSeparatorPositions) {
+                        insertText(position + 1, TAB_SPACES);
+                    }
+                }
+        }
     }
 
     @Override
@@ -96,4 +158,10 @@ public class Editor extends TextArea {
     public void setArticles(Articles articles) {
         this.articles = articles;
     }
+
+    @Override
+    public void postInit() {
+        setKeyshortHanlers();
+    }
+
 }

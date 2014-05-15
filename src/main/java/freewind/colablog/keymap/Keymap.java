@@ -23,6 +23,7 @@ public class Keymap {
         mapping.put(codes(META, F), KeyShort.SearchInEditor);
         mapping.put(codes(META, V), KeyShort.Paste);
         mapping.put(codes(META, S), KeyShort.Save);
+        mapping.put(codes(TAB), KeyShort.Tab);
     }
 
     private List<KeyCode> codes(KeyCode... codes) {

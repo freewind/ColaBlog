@@ -22,7 +22,7 @@ public class AutowireFXMLDialog extends Stage {
     @Autowired
     private ApplicationContext context;
 
-    private SpringController controller;
+    private SpringInjectable controller;
 
     public AutowireFXMLDialog(URL fxml, Window owner) {
         this(fxml, owner, StageStyle.DECORATED);
@@ -36,9 +36,9 @@ public class AutowireFXMLDialog extends Stage {
         try {
             setScene(new Scene(loader.load()));
             controller = loader.getController();
-            List<SpringController> controllers = Lists.newArrayList();
+            List<SpringInjectable> controllers = Lists.newArrayList();
             findAllControllers(controller, controllers);
-            for (SpringController ctrl : controllers) {
+            for (SpringInjectable ctrl : controllers) {
                 if (ctrl instanceof DialogController) {
                     ((DialogController) ctrl).setDialog(this);
                 }
@@ -48,14 +48,14 @@ public class AutowireFXMLDialog extends Stage {
         }
     }
 
-    private void findAllControllers(SpringController controller, List<SpringController> controllers) {
+    private void findAllControllers(SpringInjectable controller, List<SpringInjectable> controllers) {
         controllers.add(controller);
         for (Field field : controller.getClass().getDeclaredFields()) {
             field.setAccessible(true);
             try {
                 Object value = field.get(controller);
-                if (value instanceof SpringController) {
-                    findAllControllers((SpringController) value, controllers);
+                if (value instanceof SpringInjectable) {
+                    findAllControllers((SpringInjectable) value, controllers);
                 }
             } catch (IllegalAccessException e) {
                 throw new RuntimeException(e);
@@ -65,9 +65,9 @@ public class AutowireFXMLDialog extends Stage {
 
     @PostConstruct
     private void postConstruct() {
-        List<SpringController> controllers = Lists.newArrayList();
+        List<SpringInjectable> controllers = Lists.newArrayList();
         findAllControllers(controller, controllers);
-        for (SpringController ctrl : controllers) {
+        for (SpringInjectable ctrl : controllers) {
             context.getAutowireCapableBeanFactory()
                     .autowireBeanProperties(ctrl, AutowireCapableBeanFactory.AUTOWIRE_NO, false);
             ctrl.postInit();

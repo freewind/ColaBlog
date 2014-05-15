@@ -9,7 +9,7 @@ import freewind.colablog.controls.Editor;
 import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
 import freewind.colablog.models.Articles;
-import freewind.colablog.spring.SpringController;
+import freewind.colablog.spring.SpringInjectable;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
@@ -28,7 +28,7 @@ import java.io.IOException;
 
 import static java.lang.String.format;
 
-public class MainController implements SpringController {
+public class MainController implements SpringInjectable {
 
     @Autowired
     private AppInfo appInfo;

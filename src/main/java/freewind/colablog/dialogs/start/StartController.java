@@ -5,7 +5,7 @@ import freewind.colablog.config.SystemConfig;
 import freewind.colablog.spring.AutowireFXMLDialog;
 import freewind.colablog.spring.DialogController;
 import freewind.colablog.spring.ScreensConfiguration;
-import freewind.colablog.spring.SpringController;
+import freewind.colablog.spring.SpringInjectable;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.input.MouseButton;
@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.io.File;
 import java.io.IOException;
 
-public class StartController implements SpringController, DialogController {
+public class StartController implements SpringInjectable, DialogController {
 
     @Autowired
     private AppInfo appInfo;
