@@ -117,7 +117,6 @@ public class MainController implements SpringInjectable {
             String body = markdown2html(newValue);
             String imageFixed = imageSrcFixer.fixToLocal(body);
             String html = new HtmlWrapper().full(imageFixed);
-            System.out.println(html);
             preview.getEngine().loadContent(html);
         });
     }

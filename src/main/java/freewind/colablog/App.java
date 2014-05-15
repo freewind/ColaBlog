@@ -15,7 +15,6 @@ public class App extends Application {
         ScreensConfiguration screens = context.getBean(ScreensConfiguration.class);
         screens.setPrimaryStage(primaryStage);
         screens.startWindow().show();
-        System.out.println(Font.getFamilies());
     }
 
     public static void main(String[] args) {

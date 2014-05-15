@@ -1,48 +1,60 @@
 package freewind.colablog.controls;
 
 import com.google.common.collect.Lists;
-import javafx.scene.control.IndexRange;
 
 import java.util.List;
 
-class TabPositionFinder {
-    private final IndexRange selection;
+public class TabPositionFinder {
     private final String fullText;
+    private int selectionStart;
+    private int selectionEnd;
 
-    TabPositionFinder(IndexRange selection, String fullText) {
-        this.selection = selection;
+    TabPositionFinder(String fullText, int selectionStart, int selectionEnd) {
         this.fullText = fullText;
+        this.selectionStart = selectionStart;
+        this.selectionEnd = selectionEnd;
     }
 
     public List<Integer> find() {
+        removeEndingLineSeparator();
+        findingPreviousPosition();
         List<Integer> positions = Lists.newArrayList();
-        findInSelection(positions);
-        removeLastIfEndingWithLineSeparator(positions);
-        addPreviousOneIfNeed(positions);
+        findPositionsInSelection(positions);
+        addTheStartPositionIfNeed(positions);
         return positions;
     }
 
-    private void addPreviousOneIfNeed(List<Integer> positions) {
-        if (!isLineSeparator(charAt(selection.getStart()))) {
-            for (int i = selection.getStart() - 1; i >= 0; i--) {
-                if (isLineSeparator(charAt(i))) {
-                    positions.add(i);
-                    return;
-                }
+    private void addTheStartPositionIfNeed(List<Integer> positions) {
+        if (selectionStart == 0) {
+            positions.add(0);
+        }
+    }
+
+    private void findPositionsInSelection(List<Integer> positions) {
+        for (int i = selectionEnd - 1; i >= selectionStart; i--) {
+            if (isLineSeparator(charAt(i))) {
+                positions.add(i + 1);
             }
         }
     }
 
-    private void removeLastIfEndingWithLineSeparator(List<Integer> positions) {
-        if (isLineSeparator(charAt(selection.getEnd()))) {
-            positions.remove(0);
+    private void findingPreviousPosition() {
+        if (selectionStart == fullText.length()) {
+            selectionStart--;
         }
+        for (int i = selectionStart; i >= 0; i--) {
+            if (isLineSeparator(charAt(i))) {
+                selectionStart = i;
+                return;
+            }
+        }
+        selectionStart = 0;
     }
 
-    private void findInSelection(List<Integer> positions) {
-        for (int position = selection.getEnd(); position >= selection.getStart(); position--) {
-            if (isLineSeparator(charAt(position))) {
-                positions.add(position);
+    private void removeEndingLineSeparator() {
+        if (selectionEnd > selectionStart) {
+            if (isLineSeparator(charAt(selectionEnd - 1))) {
+                selectionEnd--;
             }
         }
     }

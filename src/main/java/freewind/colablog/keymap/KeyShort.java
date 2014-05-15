@@ -8,6 +8,7 @@ public enum KeyShort {
     SearchInEditor,
     Paste,
     Save,
-    Tab
+    Tab,
+    ShiftTab
 
 }

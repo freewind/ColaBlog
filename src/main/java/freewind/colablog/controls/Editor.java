@@ -40,7 +40,6 @@ public class Editor extends TextArea implements SpringInjectable {
 
     private void setKeyshortHanlers() {
         this.setOnKeyPressed(keyEvent -> {
-            System.out.println(keyEvent);
             KeyShort keyShort = keymap.findKeyShort(keyEvent);
             if (keyShort != null) {
                 handleKeyshort(keyShort, keyEvent);
@@ -69,27 +68,47 @@ public class Editor extends TextArea implements SpringInjectable {
                 }
                 return;
             case Save:
-                System.out.println("####### pressed Save");
                 this.save();
                 return;
             case Tab:
                 keyEvent.consume();
-                IndexRange selection = getSelection();
-                if (selection.getLength() == 0) {
+                if (getSelection().getLength() == 0) {
                     this.insertText(getAnchor(), TAB_SPACES);
                 } else {
-                    List<Integer> lineSeparatorPositions = new TabPositionFinder(selection, getText()).find();
-                    System.out.println(lineSeparatorPositions.size());
+                    List<Integer> lineSeparatorPositions = new TabPositionFinder(getText(), getSelection().getStart(), getSelection().getEnd()).find();
+                    System.out.println("### positions: " + lineSeparatorPositions);
                     for (int position : lineSeparatorPositions) {
-                        insertText(position + 1, TAB_SPACES);
+                        insertText(position, TAB_SPACES);
+                    }
+                }
+                return;
+            case ShiftTab:
+                keyEvent.consume();
+                List<Integer> lineSeparatorPositions = new TabPositionFinder(getText(), getSelection().getStart(), getSelection().getEnd()).find();
+                System.out.println(lineSeparatorPositions);
+                for (int position : lineSeparatorPositions) {
+                    int end = findDeletionEnd(position);
+                    if (end > position) {
+                        deleteText(position, end);
                     }
                 }
         }
     }
 
+    private int findDeletionEnd(int position) {
+        int end = position;
+        for (int i = position; i < Math.min(getText().length(), position + TAB_SPACES.length()); i++) {
+            if (getText().charAt(i) == ' ') {
+                end = i + 1;
+            } else {
+                break;
+            }
+        }
+        return end;
+    }
+
     @Override
     public void paste() {
-        System.out.println("### paste ###");
         if (clipboardPastingHandler.handle(Clipboard.getSystemClipboard())) {
             return;
         }
@@ -143,7 +162,6 @@ public class Editor extends TextArea implements SpringInjectable {
     public void loadArticle(Article currentArticle) {
         this.currentArticle = currentArticle;
         this.textProperty().set(currentArticle.getContent());
-        System.out.println("####### currentAritcle: " + currentArticle);
     }
 
     public void newArticle() {
