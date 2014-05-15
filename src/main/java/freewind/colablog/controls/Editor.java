@@ -75,23 +75,34 @@ public class Editor extends TextArea implements SpringInjectable {
                 if (getSelection().getLength() == 0) {
                     this.insertText(getAnchor(), TAB_SPACES);
                 } else {
-                    List<Integer> lineSeparatorPositions = new TabPositionFinder(getText(), getSelection().getStart(), getSelection().getEnd()).find();
-                    System.out.println("### positions: " + lineSeparatorPositions);
+                    IndexRange selection = getSelection();
+                    List<Integer> lineSeparatorPositions = new TabPositionFinder(getText(), selection.getStart(), selection.getEnd()).find();
                     for (int position : lineSeparatorPositions) {
                         insertText(position, TAB_SPACES);
                     }
+                    selectRange(selection.getStart() + TAB_SPACES.length(), selection.getEnd() + TAB_SPACES.length() * lineSeparatorPositions.size());
                 }
                 return;
             case ShiftTab:
                 keyEvent.consume();
-                List<Integer> lineSeparatorPositions = new TabPositionFinder(getText(), getSelection().getStart(), getSelection().getEnd()).find();
-                System.out.println(lineSeparatorPositions);
+                IndexRange selection = getSelection();
+                List<Integer> lineSeparatorPositions = new TabPositionFinder(getText(), selection.getStart(), selection.getEnd()).find();
+                int deletedBeforeSelection = 0;
+                int deletedInsideSelection = 0;
                 for (int position : lineSeparatorPositions) {
                     int end = findDeletionEnd(position);
                     if (end > position) {
                         deleteText(position, end);
+                        int deleted = end - position;
+                        if (position < selection.getStart()) {
+                            deletedBeforeSelection += deleted;
+                        } else {
+                            deletedInsideSelection += deleted;
+                        }
                     }
                 }
+                int newStart = selection.getStart() - deletedBeforeSelection;
+                selectRange(newStart, Math.max(newStart, selection.getEnd() - deletedBeforeSelection - deletedInsideSelection));
         }
     }
 
