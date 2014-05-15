@@ -10,7 +10,6 @@ import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
 import freewind.colablog.models.Articles;
 import freewind.colablog.spring.SpringController;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ScrollBar;
@@ -49,6 +48,8 @@ public class MainController implements SpringController {
     private EditorController editorPaneController;
     @FXML
     private ListView<String> fontListView;
+    @FXML
+    private BorderPane previewPane;
     @Autowired
     private Articles articles;
 
@@ -89,8 +90,9 @@ public class MainController implements SpringController {
     }
 
     private void uiSettings() {
-        HBox.setHgrow(preview, Priority.ALWAYS);
         HBox.setHgrow(editorPane, Priority.ALWAYS);
+        HBox.setHgrow(previewPane, Priority.ALWAYS);
+        HBox.setHgrow(preview, Priority.ALWAYS);
         articleListView.managedProperty().bind(articleListView.visibleProperty());
         fontListView.managedProperty().bind(fontListView.visibleProperty());
     }
@@ -170,4 +172,10 @@ public class MainController implements SpringController {
     public void createNewArticle() {
         getEditor().newArticle();
     }
+
+    public void showHtml() {
+        String html = (String) preview.getEngine().executeScript("document.documentElement.outerHTML");
+        System.out.println(html);
+    }
+
 }

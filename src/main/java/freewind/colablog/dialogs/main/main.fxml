@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
@@ -20,5 +20,12 @@
     <ListView fx:id="articleListView" prefHeight="200.0" prefWidth="200.0" visible="false"/>
     <ListView fx:id="fontListView" prefHeight="200.0" prefWidth="200.0" visible="false"/>
     <fx:include fx:id="editorPane" source="editor.fxml" prefWidth="200.0" prefHeight="200.0"/>
-    <WebView fx:id="preview" prefHeight="200.0" prefWidth="200.0"/>
+    <BorderPane fx:id="previewPane" prefHeight="200.0" prefWidth="200.0">
+        <center>
+            <WebView fx:id="preview" prefHeight="200.0" prefWidth="200.0"/>
+        </center>
+        <bottom>
+            <Button onAction="#showHtml" text="Show HTML" />
+        </bottom>
+    </BorderPane>
 </HBox>
