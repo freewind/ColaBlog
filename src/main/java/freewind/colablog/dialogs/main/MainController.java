@@ -113,10 +113,10 @@ public class MainController implements SpringController {
     private void livePreview() {
         getEditor().textProperty().addListener((observableValue, oldValue, newValue) -> {
             String body = markdown2html(newValue);
-            String html = new HtmlWrapper().full(body);
-            String imageFixed = imageSrcFixer.fixToLocal(html);
-            System.out.println(imageFixed);
-            preview.getEngine().loadContent(imageFixed);
+            String imageFixed = imageSrcFixer.fixToLocal(body);
+            String html = new HtmlWrapper().full(imageFixed);
+            System.out.println(html);
+            preview.getEngine().loadContent(html);
         });
     }
 
