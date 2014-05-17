@@ -1,5 +1,7 @@
 package freewind.colablog.controls;
 
+import com.google.common.collect.Lists;
+import freewind.colablog.common.TextOperations;
 import freewind.colablog.keymap.KeyShort;
 import freewind.colablog.keymap.Keymap;
 import freewind.colablog.models.Article;
@@ -7,7 +9,6 @@ import freewind.colablog.models.Articles;
 import freewind.colablog.spring.SpringInjectable;
 import freewind.colablog.structrue.BlogStructure;
 import freewind.colablog.utils.IO;
-import javafx.scene.control.IndexRange;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.input.Clipboard;
@@ -22,100 +23,68 @@ import java.util.List;
 
 public class Editor extends TextArea implements SpringInjectable {
 
-    public static final String TAB_SPACES = "    ";
     private Article currentArticle;
 
     private ClipboardPastingHandler clipboardPastingHandler;
 
     private BlogStructure blogStructure;
     private Articles articles;
-    private Double initFontSize;
-
+    private TextOperations textOperations;
     @Autowired
     private Keymap keymap;
+    private TextOperations.MoveUpDownHandler upDownHandler;
 
     public void setClipboardPastingHandler(ClipboardPastingHandler clipboardPastingHandler) {
         this.clipboardPastingHandler = clipboardPastingHandler;
     }
 
     private void setKeyshortHanlers() {
+        List<KeyshortHandler> handlers = Lists.newArrayList(
+                new FontSizeKeyshortHandler(this),
+                new TabKeyshortHandler(this)
+        );
+
         this.setOnKeyPressed(keyEvent -> {
             KeyShort keyShort = keymap.findKeyShort(keyEvent);
             if (keyShort != null) {
-                handleKeyshort(keyShort, keyEvent);
+                for (KeyshortHandler handler : handlers) {
+                    if (handler.handle(keyShort, keyEvent)) {
+                        break;
+                    }
+                }
+                handleOther(keyShort, keyEvent);
             }
         });
     }
 
-    private void handleKeyshort(KeyShort keyShort, KeyEvent keyEvent) {
-        double fontSize = this.fontProperty().getValue().getSize();
+    private int previousUpDownCaretPosition = -1;
+
+    private void handleOther(KeyShort keyShort, KeyEvent keyEvent) {
         switch (keyShort) {
-            case IncreaseFontSize:
-                if (initFontSize == null) {
-                    initFontSize = fontSize;
+            case ArrowUp:
+                keyEvent.consume();
+                if (upDownHandler == null || getCaretPosition() != previousUpDownCaretPosition) {
+                    upDownHandler = textOperations.createUpDownHandler(getCaretPosition());
                 }
-                this.setStyle("-fx-font-size: " + (fontSize + 2) + "px");
+                int pos = upDownHandler.moveUp();
+                positionCaret(pos);
+                previousUpDownCaretPosition = pos;
+                System.out.println("Move up");
                 return;
-            case DecreaseFontSize:
-                if (initFontSize == null) {
-                    initFontSize = fontSize;
+            case ArrowDown:
+                keyEvent.consume();
+                if (upDownHandler == null || getCaretPosition() != previousUpDownCaretPosition) {
+                    upDownHandler = textOperations.createUpDownHandler(getCaretPosition());
                 }
-                this.setStyle("-fx-font-size: " + (fontSize - 2) + "px");
-                return;
-            case NormalFontSize:
-                if (initFontSize != null) {
-                    this.setStyle("-fx-font-size: " + initFontSize + "px");
-                }
+                int pos1 = upDownHandler.moveDown();
+                positionCaret(pos1);
+                previousUpDownCaretPosition = pos1;
+                System.out.println("Move down");
                 return;
             case Save:
                 this.save();
                 return;
-            case Tab:
-                keyEvent.consume();
-                if (getSelection().getLength() == 0) {
-                    this.insertText(getAnchor(), TAB_SPACES);
-                } else {
-                    IndexRange selection = getSelection();
-                    List<Integer> lineSeparatorPositions = new TabPositionFinder(getText(), selection.getStart(), selection.getEnd()).find();
-                    for (int position : lineSeparatorPositions) {
-                        insertText(position, TAB_SPACES);
-                    }
-                    selectRange(selection.getStart() + TAB_SPACES.length(), selection.getEnd() + TAB_SPACES.length() * lineSeparatorPositions.size());
-                }
-                return;
-            case ShiftTab:
-                keyEvent.consume();
-                IndexRange selection = getSelection();
-                List<Integer> lineSeparatorPositions = new TabPositionFinder(getText(), selection.getStart(), selection.getEnd()).find();
-                int deletedBeforeSelection = 0;
-                int deletedInsideSelection = 0;
-                for (int position : lineSeparatorPositions) {
-                    int end = findDeletionEnd(position);
-                    if (end > position) {
-                        deleteText(position, end);
-                        int deleted = end - position;
-                        if (position < selection.getStart()) {
-                            deletedBeforeSelection += deleted;
-                        } else {
-                            deletedInsideSelection += deleted;
-                        }
-                    }
-                }
-                int newStart = selection.getStart() - deletedBeforeSelection;
-                selectRange(newStart, Math.max(newStart, selection.getEnd() - deletedBeforeSelection - deletedInsideSelection));
         }
-    }
-
-    private int findDeletionEnd(int position) {
-        int end = position;
-        for (int i = position; i < Math.min(getText().length(), position + TAB_SPACES.length()); i++) {
-            if (getText().charAt(i) == ' ') {
-                end = i + 1;
-            } else {
-                break;
-            }
-        }
-        return end;
     }
 
     @Override
@@ -191,6 +160,15 @@ public class Editor extends TextArea implements SpringInjectable {
     @Override
     public void postInit() {
         setKeyshortHanlers();
+        textOperations = new TextOperations(this.getText());
+        this.textProperty().addListener((event) -> {
+            textOperations = new TextOperations(getText());
+            upDownHandler = null;
+        });
+        this.caretPositionProperty().addListener((event) -> {
+            previousUpDownCaretPosition = -1;
+        });
+
     }
 
 }

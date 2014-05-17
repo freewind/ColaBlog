@@ -1,7 +1,7 @@
 #editor, #preview {
     // -fx-font-family: 'Open Sans','Helvetica Neue','Arial','Verdana','Hiragino Sans GB','STHeiti','SimSun',sans-serif;
-    //-fx-font-family: 'Hiragino Sans GB';
-    -fx-font-family: 'YaHei Consolas Hybrid';
+    -fx-font-family: 'Hiragino Sans GB';
+    //-fx-font-family: 'YaHei Consolas Hybrid';
     -fx-font-size: 18px;
 }
 #editor .scroll-bar {

@@ -25,6 +25,9 @@ public class Keymap {
         mapping.put(codes(META, S), KeyShort.Save);
         mapping.put(codes(SHIFT, TAB), KeyShort.ShiftTab);
         mapping.put(codes(TAB), KeyShort.Tab);
+        mapping.put(codes(UP), KeyShort.ArrowUp);
+        mapping.put(codes(DOWN), KeyShort.ArrowDown);
+
     }
 
     private List<KeyCode> codes(KeyCode... codes) {

@@ -9,6 +9,8 @@ public enum KeyShort {
     Paste,
     Save,
     Tab,
-    ShiftTab
+    ShiftTab,
+    ArrowDown,
+    ArrowUp
 
 }
