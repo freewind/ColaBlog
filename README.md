@@ -1,0 +1,1 @@
+This project is suspended because of the issues of TextArea of JavaFX.
